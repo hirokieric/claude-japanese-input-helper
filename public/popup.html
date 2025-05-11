@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="settings">
+      <h3>Claude.ai 日本語入力補助</h3>
+
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="enabled" checked />
+          拡張機能を有効にする
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="useShiftEnter" />
+          Shift+Enterで送信する
+        </label>
+        <small>※チェックを外すとEnterのみで送信</small>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
