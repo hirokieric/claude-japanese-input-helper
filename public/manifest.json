@@ -3,6 +3,8 @@
   "name": "Claude.ai Japanese Input Helper",
   "version": "1.0.0",
   "description": "Prevents accidental submission during Japanese input conversion in Claude.ai",
+  "author": "Hiroki Naito",
+  "homepage_url": "https://github.com/hirokieric/claude-japanese-input-helper",
   "permissions": ["storage"],
   "host_permissions": ["https://claude.ai/*"],
   "content_scripts": [
