@@ -171,7 +171,14 @@ class ClaudeInputHelper {
 
       // Allow submission if Shift+Enter is enabled and Shift is pressed
       if (this.useShiftEnter && e.shiftKey) {
-        console.log("Shift+Enter detected - allowing submission");
+        console.log("Shift+Enter detected - submitting");
+        // フォームを探して送信
+        const form = target.closest("form");
+        if (form) {
+          e.preventDefault();
+          e.stopPropagation();
+          form.requestSubmit();
+        }
         return;
       }
 
@@ -194,7 +201,25 @@ class ClaudeInputHelper {
       if (this.useShiftEnter && !e.shiftKey) {
         e.preventDefault();
         e.stopPropagation();
-        console.log("Enter without Shift prevented - Shift+Enter required");
+        // 改行を挿入
+        const textarea = target as HTMLTextAreaElement;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const value = textarea.value;
+        textarea.value =
+          value.substring(0, start) + "\n" + value.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + 1;
+
+        // auto adjust height
+        const inputEvent = new InputEvent("input", {
+          bubbles: true,
+          cancelable: true,
+          inputType: "insertLineBreak",
+          data: "\n",
+        });
+        textarea.dispatchEvent(inputEvent);
+
+        console.log("Enter without Shift - inserted newline");
         return;
       }
 
