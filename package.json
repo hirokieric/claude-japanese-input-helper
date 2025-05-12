@@ -1,6 +1,6 @@
 {
   "name": "claude-japanese-input-helper",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build",
