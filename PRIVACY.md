@@ -2,7 +2,7 @@
 
 Privacy Policy for Claude.ai Japanese Input Helper
 
-Last updated: [Date]
+Last updated: May 12th, 2025
 
 ## 1. Information We Collect
 
@@ -48,7 +48,7 @@ These permissions are the minimum required to achieve the extension's purpose.
 ## 7. Contact
 
 For questions about this privacy policy, please contact:
-[Your email address]
+contact@enprods.com
 
 ## 8. Changes
 
