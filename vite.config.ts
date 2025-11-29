@@ -17,6 +17,14 @@ export default defineConfig({
       },
     },
     target: "chrome91", // Chrome拡張機能向けのターゲット
+    minify: "esbuild",
   },
   publicDir: "public",
+  define: {
+    // 本番ビルド時はMODEをproductionに設定
+    "import.meta.env.MODE": JSON.stringify(
+      process.env.NODE_ENV === "production" ? "production" : "development"
+    ),
+  },
 });
+

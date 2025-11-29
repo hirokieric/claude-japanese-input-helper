@@ -1,4 +1,5 @@
 import { ExtensionSettings, StorageResult } from "./interfaces/settings";
+import { logger } from "./utils/logger";
 
 /**
  * Main class that handles Japanese input behavior in Claude's interface
@@ -38,9 +39,9 @@ class ClaudeInputHelper {
     try {
       await this.loadSettings();
       this.setupListeners();
-      console.log("Claude Input Helper initialized successfully");
+      logger.log("Claude Input Helper initialized successfully");
     } catch (error) {
-      console.error("Failed to initialize Claude Input Helper:", error);
+      logger.error("Failed to initialize Claude Input Helper:", error);
     }
   }
 
@@ -50,18 +51,18 @@ class ClaudeInputHelper {
    */
   private async loadSettings(): Promise<void> {
     try {
-      const result = (await chrome.storage.sync.get([
+      const result: StorageResult = await chrome.storage.sync.get([
         "enabled",
         "useShiftEnter",
-      ])) as StorageResult;
+      ]);
       this.isEnabled = result.enabled !== false;
-      this.useShiftEnter = result.useShiftEnter || false;
-      console.log("Settings loaded:", {
+      this.useShiftEnter = result.useShiftEnter ?? false;
+      logger.log("Settings loaded:", {
         enabled: this.isEnabled,
         useShiftEnter: this.useShiftEnter,
       });
     } catch (error) {
-      console.error("Failed to load settings:", error);
+      logger.error("Failed to load settings:", error);
     }
   }
 
@@ -75,18 +76,18 @@ class ClaudeInputHelper {
 
     // Track IME composition state
     document.addEventListener("compositionstart", (e) => {
-      const target = e.target as HTMLElement;
-      if (this.isEditingTextarea(target)) {
+      const target = e.target;
+      if (target instanceof HTMLElement && this.isEditingTextarea(target)) {
         this.isComposing = true;
-        console.log("IME composition started on editing textarea");
+        logger.log("IME composition started on editing textarea");
       }
     });
 
     document.addEventListener("compositionend", (e) => {
-      const target = e.target as HTMLElement;
-      if (this.isEditingTextarea(target)) {
+      const target = e.target;
+      if (target instanceof HTMLElement && this.isEditingTextarea(target)) {
         this.isComposing = false;
-        console.log("IME composition ended on editing textarea");
+        logger.log("IME composition ended on editing textarea");
       }
     });
 
@@ -104,11 +105,11 @@ class ClaudeInputHelper {
   }): void {
     if (changes.enabled) {
       this.isEnabled = changes.enabled.newValue;
-      console.log("Extension enabled state changed:", this.isEnabled);
+      logger.log("Extension enabled state changed:", this.isEnabled);
     }
     if (changes.useShiftEnter) {
       this.useShiftEnter = changes.useShiftEnter.newValue;
-      console.log("Shift+Enter option changed:", this.useShiftEnter);
+      logger.log("Shift+Enter option changed:", this.useShiftEnter);
     }
   }
 
@@ -152,7 +153,8 @@ class ClaudeInputHelper {
   private handleKeyDown(e: KeyboardEvent): void {
     if (!this.isEnabled) return;
 
-    const target = e.target as HTMLElement;
+    const target = e.target;
+    if (!target || !(target instanceof HTMLElement)) return;
 
     // Check if target is an editing textarea
     if (!this.isEditingTextarea(target)) return;
@@ -167,11 +169,11 @@ class ClaudeInputHelper {
         targetClasses: target.className,
       };
 
-      console.log("Enter key pressed in editing textarea:", logDetails);
+      logger.log("Enter key pressed in editing textarea:", logDetails);
 
       // Allow submission if Shift+Enter is enabled and Shift is pressed
       if (this.useShiftEnter && e.shiftKey) {
-        console.log("Shift+Enter detected - submitting");
+        logger.log("Shift+Enter detected - submitting");
         // フォームを探して送信
         const form = target.closest("form");
         if (form) {
@@ -184,7 +186,7 @@ class ClaudeInputHelper {
 
       // Allow new line if Shift+Enter is disabled and Shift is pressed
       if (!this.useShiftEnter && e.shiftKey) {
-        console.log("Shift+Enter for new line - allowing default behavior");
+        logger.log("Shift+Enter for new line - allowing default behavior");
         return;
       }
 
@@ -193,7 +195,7 @@ class ClaudeInputHelper {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        console.log("Enter key prevented during IME composition");
+        logger.log("Enter key prevented during IME composition");
         return;
       }
 
@@ -202,7 +204,8 @@ class ClaudeInputHelper {
         e.preventDefault();
         e.stopPropagation();
         // 改行を挿入
-        const textarea = target as HTMLTextAreaElement;
+        if (!(target instanceof HTMLTextAreaElement)) return;
+        const textarea = target;
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
         const value = textarea.value;
@@ -219,12 +222,12 @@ class ClaudeInputHelper {
         });
         textarea.dispatchEvent(inputEvent);
 
-        console.log("Enter without Shift - inserted newline");
+        logger.log("Enter without Shift - inserted newline");
         return;
       }
 
       // Allow default submission behavior for regular Enter
-      console.log("Regular Enter - allowing submission");
+      logger.log("Regular Enter - allowing submission");
     }
   }
 }

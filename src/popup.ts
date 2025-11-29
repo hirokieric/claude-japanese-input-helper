@@ -1,4 +1,5 @@
 import { ExtensionSettings, StorageResult } from "./interfaces/settings";
+import { logger } from "./utils/logger";
 
 /**
  * Controller class for the extension's popup interface
@@ -42,7 +43,7 @@ class PopupController {
       await this.loadSettings();
       this.setupListeners();
     } catch (error) {
-      console.error("Failed to initialize popup:", error);
+      logger.error("Failed to initialize popup:", error);
     }
   }
 
@@ -52,14 +53,14 @@ class PopupController {
    */
   private async loadSettings(): Promise<void> {
     try {
-      const result = (await chrome.storage.sync.get([
+      const result: StorageResult = await chrome.storage.sync.get([
         "enabled",
         "useShiftEnter",
-      ])) as StorageResult;
+      ]);
       this.enabledCheckbox.checked = result.enabled !== false;
-      this.shiftEnterCheckbox.checked = result.useShiftEnter || false;
+      this.shiftEnterCheckbox.checked = result.useShiftEnter ?? false;
     } catch (error) {
-      console.error("Failed to load settings:", error);
+      logger.error("Failed to load settings:", error);
     }
   }
 
@@ -74,9 +75,9 @@ class PopupController {
         await chrome.storage.sync.set({
           enabled: this.enabledCheckbox.checked,
         });
-        console.log("Enabled setting updated:", this.enabledCheckbox.checked);
+        logger.log("Enabled setting updated:", this.enabledCheckbox.checked);
       } catch (error) {
-        console.error("Failed to save enabled setting:", error);
+        logger.error("Failed to save enabled setting:", error);
       }
     });
 
@@ -85,12 +86,12 @@ class PopupController {
         await chrome.storage.sync.set({
           useShiftEnter: this.shiftEnterCheckbox.checked,
         });
-        console.log(
+        logger.log(
           "Shift+Enter setting updated:",
           this.shiftEnterCheckbox.checked
         );
       } catch (error) {
-        console.error("Failed to save shift+enter setting:", error);
+        logger.error("Failed to save shift+enter setting:", error);
       }
     });
   }
